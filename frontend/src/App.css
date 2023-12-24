@@ -1,0 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400&family=Roboto:wght@300&display=swap");
+
+.App{
+  min-height: 100vh;
+  display: flex;
+  background-image: url("../public/Chatbackground.jpg");
+  /* background-color: blue; */
+  background-position:right;
+  background-size:cover ;
+}
