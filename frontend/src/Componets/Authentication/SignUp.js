@@ -8,105 +8,194 @@ import {
   InputGroup,
   InputRightElement,
   VStack,
+  useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
-
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import axios from "axios";
 export default () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [show, setShow] = useState(false);
-  
+  const [pic, setPic] = useState("");
+  const [loading, setLoading] = useState(false);
+  const toast = useToast();
   const handleClick = () => {
     setShow(!show);
   };
+  const history = useHistory();
+  const postDetails = (pics) => {
+    console.log(pics.type);
+    setLoading(true);
+    if (pics === undefined) {
+      toast({
+        title: "please Select an Image",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
+    if (pics.type === "image/jpeg" || pics.type === "image/png" || pics.type ==="image/jfif") {
+      const data = new FormData();
+      data.append("file", pics);
+      data.append("upload_preset", "ChatApp");
+      data.append("cloud_name", "digu4fdia");
+      fetch("https://api.cloudinary.com/v1_1/udaykiran2307/image/upload", {
+        method: "post",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(typeof(data.url));
+          setPic(data.url);
+          // console.log(data);
+         
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+        });
 
-  const postDetails = ()=>{
+        console.log(pic, typeof(pic));
+    }
+    else{
+      toast({
+        title: "please Select an Image",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+   
+  };
+  const submitHandler = async () => {
+    setLoading(true);
+    if (!name || !email || !password || !confirmPassword) {
+      toast({
+        title: "Please Fill all the fields",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setLoading(false);
+      return;
+    }
 
-  }
-  const submitHandler = ()=>{
-
-  }
+    try {
+      const config = {
+        headers: { "content-type": "application/json" },
+      };
+      const { data } = await axios.post(
+        "/api/user",
+        { name, email, password, pic },
+        config
+      );
+      toast({
+        title: "Sign up is successful ",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setLoading(false);
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      history.push("/chats");
+    } catch (err) {
+      console.log(err)
+      toast({
+        title: err.response.data.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setLoading(false);
+    }
+  };
 
   return (
-      <VStack>
-        <FormControl id="name" isRequired="true">
-          <FormLabel>Name</FormLabel>
+    <VStack>
+      <FormControl id="name" isRequired="true">
+        <FormLabel>Name</FormLabel>
+        <Input
+          placeholder="Enter your Name"
+          onChange={(e) => {
+            setName(e.target.value);
+          }}
+          value={name}
+        />
+      </FormControl>
+      <FormControl id="email" isRequired="true">
+        <FormLabel>Email</FormLabel>
+        <Input
+          placeholder="Enter your Email"
+          onChange={(e) => {
+            setEmail(e.target.value);
+          }}
+          value={email}
+        />
+      </FormControl>
+      <FormControl id="password" isRequired="true">
+        <FormLabel>Password</FormLabel>
+        <InputGroup>
           <Input
-            placeholder="Enter your Name"
+            type={show ? "text" : "password"}
+            placeholder="Enter Password"
             onChange={(e) => {
-              setName(e.target.value);
+              setPassword(e.target.value);
             }}
-            value={name}
+            value={password}
           />
-        </FormControl>
-        <FormControl id="email" isRequired="true">
-          <FormLabel>Email</FormLabel>
+          <InputRightElement>
+            <Button h="1.75rem" size="sm" onClick={handleClick}>
+              {show ? "Hide" : "Show"}
+            </Button>
+          </InputRightElement>
+        </InputGroup>
+      </FormControl>
+      <FormControl id="confirmPassword" isRequired="true">
+        <FormLabel>Confirm Password</FormLabel>
+        <InputGroup>
           <Input
-            placeholder="Enter your Email"
+            type={show ? "text" : "password"}
+            placeholder="Confirm Password"
             onChange={(e) => {
-              setEmail(e.target.value);
+              setConfirmPassword(e.target.value);
             }}
-            value={email}
+            value={confirmPassword}
           />
-        </FormControl>
-        <FormControl id="password" isRequired="true">
-          <FormLabel>Password</FormLabel>
-          <InputGroup>
-            <Input
-              type={show ? "text" : "password"}
-              placeholder="Enter Password"
-              onChange={(e) => {
-                setPassword(e.target.value);
-              }}
-              value={password}
-            />
-            <InputRightElement>
-              <Button h="1.75rem" size="sm" onClick={handleClick}>
-                {show ? "Hide" : "Show"}
-              </Button>
-            </InputRightElement>
-          </InputGroup>
-        </FormControl>
-        <FormControl id="confirmPassword" isRequired="true">
-          <FormLabel>Confirm Password</FormLabel>
-          <InputGroup>
-            <Input
-              type={show ? "text" : "password"}
-              placeholder="Confirm Password"
-              onChange={(e) => {
-                setConfirmPassword(e.target.value);
-              }}
-              value={confirmPassword}
-            />
-            <InputRightElement>
-              <Button h="1.75rem" size="sm" onClick={handleClick}>
-                {show ? "Hide" : "Show"}
-              </Button>
-            </InputRightElement>
-          </InputGroup>
-        </FormControl>
-        <FormControl id='pic'>
-            <FormLabel>
-                Upload Profile Pic
-            </FormLabel>
-            <Input
-            type="file"
-            p={1.5}
-            accept="image/*"
-            onChange={(e)=>postDetails(e.target.files[0])}
-            />
-        </FormControl>
-        <Button
+          <InputRightElement>
+            <Button h="1.75rem" size="sm" onClick={handleClick}>
+              {show ? "Hide" : "Show"}
+            </Button>
+          </InputRightElement>
+        </InputGroup>
+      </FormControl>
+      <FormControl id="pic">
+        <FormLabel>Upload Profile Pic</FormLabel>
+        <Input
+          type="file"
+          p={1.5}
+          accept="image/*"
+          onChange={(e) => postDetails(e.target.files[0])}
+        />
+      </FormControl>
+      <Button
         colorScheme="green"
-        width='100%'
-        style={{marginTop:15}}
+        width="100%"
+        style={{ marginTop: 15 }}
         onClick={submitHandler}
-        >
-         SignUp   
-        </Button>
-      </VStack>
-    
+        loading={loading}
+      >
+        SignUp
+      </Button>
+    </VStack>
   );
 };
