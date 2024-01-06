@@ -4,11 +4,12 @@ const { chats } = require("./data/data.js");
 app.use(express.json());
 const dotenv = require("dotenv");
 dotenv.config();
-const cors = require('cors');
+const cors = require("cors");
 const connectDb = require("./config/db.js");
-const {errorHandler,notFound} = require('./middlewares/errorHandler.js')
+const { errorHandler, notFound } = require("./middlewares/errorHandler.js");
 connectDb();
-const routes = require('./routes/index.js');
+const routes = require("./routes/index.js");
+
 const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.listen(PORT, () => {

@@ -13,7 +13,17 @@ import {
 import { ChatIcon } from "@chakra-ui/icons";
 import Login from "../Componets/Authentication/Login.js";
 import SignUp from "../Componets/Authentication/SignUp";
+import { useEffect } from "react";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min.js";
 export default () => {
+  const history = useHistory();
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("userInfo"));
+    if (user) {
+      history.push("/chats");
+    }
+  }, []);
+
   return (
     <Container maxW="xl" centerContent>
       <Box
@@ -46,8 +56,12 @@ export default () => {
             <Tab width="50%">Sign Up</Tab>
           </TabList>
           <TabPanels>
-            <TabPanel><Login/></TabPanel>
-            <TabPanel><SignUp/></TabPanel>
+            <TabPanel>
+              <Login />
+            </TabPanel>
+            <TabPanel>
+              <SignUp />
+            </TabPanel>
           </TabPanels>
         </Tabs>
       </Box>

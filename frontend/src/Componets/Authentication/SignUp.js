@@ -19,7 +19,7 @@ export default () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [show, setShow] = useState(false);
-  const [pic, setPic] = useState("");
+  const [pic, setPic] = useState("https://imgs.search.brave.com/Evls_n45SXJWvHRGRQWHlz6EUt0iGjxIvPflf-mgeSQ/rs:fit:500:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzAzLzQwLzEyLzQ5/LzM2MF9GXzM0MDEy/NDkzNF9iejNwUVRM/cmRGcEg5MmVra251/YVRIeThKdVhnRzdm/aS5qcGc");
   const [loading, setLoading] = useState(false);
   const toast = useToast();
   const handleClick = () => {
@@ -107,6 +107,7 @@ export default () => {
       setLoading(false);
       localStorage.setItem("userInfo", JSON.stringify(data));
       history.push("/chats");
+      window.location.reload();
     } catch (err) {
       console.log(err)
       toast({
